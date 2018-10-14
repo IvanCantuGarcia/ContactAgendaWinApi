@@ -14,7 +14,9 @@ HWND hwndMainWindowListBox;
 LRESULT CALLBACK mainWindowProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK addContactWindowProc(HWND, UINT, WPARAM, LPARAM);
 
+
 int getContactNewId();
+void getContactById(int, Contact&);
 void addContact(HWND);
 void saveContacts(HWND);
 void loadContacts();
@@ -23,7 +25,7 @@ void loadContactListBox(HWND, int);
 
 Contact *origin, *aux;
 
-int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow){
+int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
 
 	origin = aux = NULL;
 
@@ -32,71 +34,105 @@ int WINAPI wWinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdL
 	hwndMainWindow = CreateDialog(hInstance, MAKEINTRESOURCE(ID_ContactListDialog), 0, mainWindowProc);
 	ShowWindow(hwndMainWindow, SW_SHOW);
 
-    MSG msg;
+	MSG msg;
 	ZeroMemory(&msg, sizeof(msg));
 
-    while (GetMessage(&msg, 0, 0, 0))
-    {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-    }
+	while (GetMessage(&msg, 0, 0, 0))
+	{
+		TranslateMessage(&msg);
+		DispatchMessage(&msg);
+	}
 
-    return (int) msg.wParam;
+	return (int)msg.wParam;
 }
 
 LRESULT CALLBACK mainWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-    switch (message)
-    {
-		case WM_INITDIALOG:
+	switch (message)
+	{
+	case WM_INITDIALOG:
+	{
+
+		loadContactListBox(hWnd, ID_ContactListBox);
+
+	}
+	break;
+	case WM_COMMAND:
+	{
+		int who = LOWORD(wParam);
+		int what = HIWORD(wParam);
+
+		switch (who)
 		{
-		
-			loadContactListBox(hWnd, ID_ContactListBox);
+			case ID_AddContactWindowBtn: {
 
-		}
-		break;
-		case WM_COMMAND:
-			{
-				int who = LOWORD(wParam);
-				int what = HIWORD(wParam);
-          
-				switch (who)
-				{
-					case ID_AddContactWindowBtn: {
+				HWND hwndAddContactDialog = CreateDialog(hInst, MAKEINTRESOURCE(ID_AddContactDialog), 0, addContactWindowProc);
+				ShowWindow(hwndMainWindow, SW_HIDE);
+				ShowWindow(hwndAddContactDialog, SW_SHOW);
 
-						HWND hwndAddContactDialog = CreateDialog(hInst, MAKEINTRESOURCE(ID_AddContactDialog), 0, addContactWindowProc);
-						ShowWindow(hwndMainWindow, SW_HIDE);
-						ShowWindow(hwndAddContactDialog, SW_SHOW);
-
-					}
-					break;
-
-					case ID_ExitBtn: {
-
-						DestroyWindow(hWnd);
-
-					}
-					break;
-				}
 			}
 			break;
-		case WM_DESTROY:
-		{
-			saveContacts(hWnd);
-			PostQuitMessage(0);
-		}
-		break;
 
-		default:
+			case ID_ExitBtn: {
+
+				DestroyWindow(hWnd);
+
+			}
 			break;
-    }
-    return 0;
+			case ID_ContactListBox: {
+
+				if (what == LBN_SELCHANGE)
+				{
+					hwndMainWindowListBox = GetDlgItem(hWnd, ID_ContactListBox);
+					int selectedItem = (int)SendMessage(hwndMainWindowListBox, LB_GETCURSEL, 0, 0);
+					int contactId = (int)SendMessage(hwndMainWindowListBox, LB_GETITEMDATA, selectedItem, 0);
+
+					Contact selectedContact;
+					selectedContact.contactId = -1;
+
+					getContactById(contactId, selectedContact);
+
+					if (selectedContact.contactId != -1)
+					{
+						SetDlgItemText(hWnd, ID_ShowNameTxt, (selectedContact.name).c_str());
+						SetDlgItemText(hWnd, ID_ShowLastNameTxt, (selectedContact.lastName).c_str());
+						SetDlgItemText(hWnd, ID_ShowPhoneNumberTxt, (selectedContact.phoneNumber).c_str());
+						SetDlgItemText(hWnd, ID_ShowEmailTxt, (selectedContact.email).c_str());
+						SetDlgItemText(hWnd, ID_ShowStreetTxt, (selectedContact.street).c_str());
+						SetDlgItemText(hWnd, ID_ShowStreetNumberTxt, (selectedContact.streetNumber).c_str());
+						SetDlgItemText(hWnd, ID_ShowBetweenStreetsTxt, (selectedContact.betweenStreets).c_str());
+						SetDlgItemText(hWnd, ID_ShowCPTxt, (selectedContact.CP).c_str());
+						SetDlgItemText(hWnd, ID_ShowSuburbTxt, (selectedContact.suburb).c_str());
+						SetDlgItemText(hWnd, ID_ShowCityTxt, (selectedContact.city).c_str());
+						SetDlgItemText(hWnd, ID_ShowStateTxt, (selectedContact.state).c_str());
+						SetDlgItemText(hWnd, ID_ShowCountryTxt, (selectedContact.country).c_str());
+					}
+
+				}
+
+			}
+			break;
+		
+		}
+	}
+	break;
+	case WM_DESTROY:
+	{
+		saveContacts(hWnd);
+		PostQuitMessage(0);
+	}
+	break;
+
+	default:
+		break;
+	}
+	return 0;
 }
 
 LRESULT CALLBACK addContactWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 
-	switch (message) 
+	switch (message)
 	{
 	case WM_COMMAND:
 	{
@@ -105,26 +141,26 @@ LRESULT CALLBACK addContactWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
 
 		switch (who)
 		{
-			case ID_AddContactSaveBtn: {
-		
-				addContact(hWnd);
-				MessageBox(hWnd, L"Se ha agregado exitosamente el Contacto.", L"Guardado.", MB_ICONINFORMATION);
-				DestroyWindow(hWnd);
+		case ID_AddContactSaveBtn: {
 
-			}
-			break;
-			case ID_AddContactCancelBtn: {
-				
-				DestroyWindow(hWnd);
+			addContact(hWnd);
+			MessageBox(hWnd, L"Se ha agregado exitosamente el Contacto.", L"Guardado.", MB_ICONINFORMATION);
+			DestroyWindow(hWnd);
 
-			}
-			break;
+		}
+								   break;
+		case ID_AddContactCancelBtn: {
+
+			DestroyWindow(hWnd);
+
+		}
+									 break;
 		}
 	}
 	break;
 	case WM_DESTROY:
 	{
-		loadContactListBox(hwndMainWindow,ID_ContactListBox);
+		loadContactListBox(hwndMainWindow, ID_ContactListBox);
 		ShowWindow(hwndMainWindow, SW_SHOW);
 	}
 	break;
@@ -132,7 +168,23 @@ LRESULT CALLBACK addContactWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
 	return 0;
 }
 
-int getContactNewId(){
+void getContactById(int idContactAux, Contact &contactAux) {
+
+	aux = origin;
+
+	while (aux != NULL)
+	{
+		if (aux->contactId == idContactAux)
+		{
+			contactAux = *aux;
+			break;
+		}
+		aux = aux->next;
+	}
+
+}
+
+int getContactNewId() {
 
 	int contactNewId = 0;
 	aux = origin;
@@ -161,7 +213,7 @@ void addContact(HWND hWnd) {
 	if (origin == NULL)
 	{
 		origin = new Contact;
-		
+
 		origin->contactId = 1;
 		GetWindowText(GetDlgItem(hWnd, ID_NameTxt), buff, 1024);
 		origin->name = buff;
@@ -187,12 +239,12 @@ void addContact(HWND hWnd) {
 		origin->state = buff;
 		GetWindowText(GetDlgItem(hWnd, ID_CountryTxt), buff, 1024);
 		origin->country = buff;
-		
+
 		origin->next = NULL;
 		origin->prev = NULL;
 	}
 	else {
-		
+
 		while (aux->next != NULL)
 			aux = aux->next;
 
@@ -248,6 +300,7 @@ void loadContacts() {
 				Contact *temp = new Contact;
 				myFile.seekg(0);
 				myFile.read(reinterpret_cast<char*>(temp), sizeof(Contact));
+				origin->contactId = temp->contactId;
 				origin->name = temp->name;
 				origin->lastName = temp->lastName;
 				origin->phoneNumber = temp->phoneNumber;
@@ -277,6 +330,7 @@ void loadContacts() {
 			aux->next->prev = aux;
 			aux->next->next = NULL;
 			aux = aux->next;
+			aux->contactId = temp->contactId;
 			aux->name = temp->name;
 			aux->lastName = temp->lastName;
 			aux->phoneNumber = temp->phoneNumber;
@@ -289,7 +343,7 @@ void loadContacts() {
 			aux->city = temp->city;
 			aux->state = temp->state;
 			aux->country = temp->country;
-			
+
 			delete reinterpret_cast<char*>(temp);
 		}
 		myFile.close();

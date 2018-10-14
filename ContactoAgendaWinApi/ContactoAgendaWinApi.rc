@@ -66,42 +66,6 @@ BEGIN
 END
 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// Dialog
-//
-
-IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
-STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
-CAPTION "About ContactoAgendaWinApi"
-FONT 8, "MS Shell Dlg", 0, 0, 0x1
-BEGIN
-    ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
-    LTEXT           "ContactoAgendaWinApi, Version 1.0",IDC_STATIC,42,14,114,8,SS_NOPREFIX
-    LTEXT           "Copyright (C) 2018",IDC_STATIC,42,26,114,8
-    DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
-END
-
-
-/////////////////////////////////////////////////////////////////////////////
-//
-// DESIGNINFO
-//
-
-#ifdef APSTUDIO_INVOKED
-GUIDELINES DESIGNINFO
-BEGIN
-    IDD_ABOUTBOX, DIALOG
-    BEGIN
-        LEFTMARGIN, 7
-        RIGHTMARGIN, 163
-        TOPMARGIN, 7
-        BOTTOMMARGIN, 55
-    END
-END
-#endif    // APSTUDIO_INVOKED
-
-
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -165,9 +129,34 @@ STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSM
 CAPTION "Dialog"
 FONT 8, "MS Shell Dlg", 400, 0, 0x1
 BEGIN
-    PUSHBUTTON      "Salir",ID_ExitBtn,553,225,50,14
+    PUSHBUTTON      "Salir",ID_ExitBtn,534,215,50,14
     LISTBOX         ID_ContactListBox,30,18,198,201,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
     PUSHBUTTON      "Agregar Contacto",ID_AddContactWindowBtn,58,225,134,14
+    GROUPBOX        "Contacto",IDC_STATIC,255,15,342,224
+    LTEXT           "Nombre",ID_ShowNameLbl,261,37,27,8
+    EDITTEXT        ID_ShowNameTxt,259,49,74,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Apellido",ID_ShowLastNameLbl,349,36,27,8
+    EDITTEXT        ID_ShowLastNameTxt,346,48,74,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Telefono",ID_ShowPhoneNumberLbl,261,76,30,8
+    EDITTEXT        ID_ShowPhoneNumberTxt,259,88,74,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Email",ID_ShowEmailLbl,349,76,19,8
+    EDITTEXT        ID_ShowEmailTxt,347,88,74,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Calle",ID_ShowStreetLbl,261,113,17,8
+    EDITTEXT        ID_ShowStreetTxt,259,125,74,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Numero",ID_ShowStreetNumberLbl,348,112,27,8
+    EDITTEXT        ID_ShowStreetNumberTxt,345,124,74,14,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
+    LTEXT           "Entre calles",ID_ShowBetweenStreetsLbl,436,112,39,8
+    EDITTEXT        ID_ShowBetweenStreetsTxt,433,124,74,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "CP",ID_ShowCPLbl,522,112,10,8
+    EDITTEXT        ID_ShowCPTxt,519,124,74,14,ES_AUTOHSCROLL | ES_READONLY | ES_NUMBER
+    LTEXT           "Colonia",ID_ShowSuburbLbl,261,149,25,8
+    EDITTEXT        ID_ShowSuburbTxt,259,161,74,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Municipio",ID_ShowCityLbl,348,148,31,8
+    EDITTEXT        ID_ShowCityTxt,345,160,74,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Estado",ID_ShowStateLbl,436,148,23,8
+    EDITTEXT        ID_ShowStateTxt,433,160,74,14,ES_AUTOHSCROLL | ES_READONLY
+    LTEXT           "Pais",ID_ShowCountryLbl,522,148,14,8
+    EDITTEXT        ID_ShowCountryTxt,519,160,74,14,ES_AUTOHSCROLL | ES_READONLY
 END
 
 ID_AddContactDialog DIALOGEX 0, 0, 392, 264
