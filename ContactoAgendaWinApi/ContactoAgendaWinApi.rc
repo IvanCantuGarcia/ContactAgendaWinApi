@@ -1,4 +1,4 @@
-//Microsoft Visual C++ generated resource script.
+// Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
 
@@ -13,11 +13,16 @@
 #define APSTUDIO_HIDDEN_SYMBOLS
 #include "windows.h"
 #undef APSTUDIO_HIDDEN_SYMBOLS
+
 /////////////////////////////////////////////////////////////////////////////
 #undef APSTUDIO_READONLY_SYMBOLS
 
+/////////////////////////////////////////////////////////////////////////////
+// English (United States) resources
+
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
-LANGUAGE 9, 1
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -26,9 +31,10 @@ LANGUAGE 9, 1
 
 // Icon with lowest ID value placed first to ensure application icon
 // remains consistent on all systems.
+IDI_CONTACTOAGENDAWINAPI ICON                    "ContactoAgendaWinApi.ico"
 
-IDI_CONTACTOAGENDAWINAPI       ICON         "ContactoAgendaWinApi.ico"
-IDI_SMALL               ICON         "small.ico"
+IDI_SMALL               ICON                    "small.ico"
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -39,11 +45,11 @@ IDC_CONTACTOAGENDAWINAPI MENU
 BEGIN
     POPUP "&File"
     BEGIN
-        MENUITEM "E&xit",                IDM_EXIT
+        MENUITEM "E&xit",                       IDM_EXIT
     END
     POPUP "&Help"
     BEGIN
-        MENUITEM "&About ...",           IDM_ABOUT
+        MENUITEM "&About ...",                  IDM_ABOUT
     END
 END
 
@@ -68,13 +74,14 @@ END
 IDD_ABOUTBOX DIALOGEX 0, 0, 170, 62
 STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
 CAPTION "About ContactoAgendaWinApi"
-FONT 8, "MS Shell Dlg"
+FONT 8, "MS Shell Dlg", 0, 0, 0x1
 BEGIN
     ICON            IDR_MAINFRAME,IDC_STATIC,14,14,21,20
     LTEXT           "ContactoAgendaWinApi, Version 1.0",IDC_STATIC,42,14,114,8,SS_NOPREFIX
     LTEXT           "Copyright (C) 2018",IDC_STATIC,42,26,114,8
     DEFPUSHBUTTON   "OK",IDOK,113,41,50,14,WS_GROUP
 END
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -94,17 +101,19 @@ BEGIN
 END
 #endif    // APSTUDIO_INVOKED
 
+
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
 //
 // TEXTINCLUDE
 //
-1 TEXTINCLUDE
+
+1 TEXTINCLUDE 
 BEGIN
     "resource.h\0"
 END
 
-2 TEXTINCLUDE
+2 TEXTINCLUDE 
 BEGIN
     "#ifndef APSTUDIO_INVOKED\r\n"
     "#include ""targetver.h""\r\n"
@@ -115,13 +124,14 @@ BEGIN
     "\0"
 END
 
-3 TEXTINCLUDE
+3 TEXTINCLUDE 
 BEGIN
     "\r\n"
     "\0"
 END
 
 #endif    // APSTUDIO_INVOKED
+
 
 /////////////////////////////////////////////////////////////////////////////
 //
@@ -130,11 +140,97 @@ END
 
 STRINGTABLE
 BEGIN
-   IDC_CONTACTOAGENDAWINAPI   "CONTACTOAGENDAWINAPI"
-   IDS_APP_TITLE       "ContactoAgendaWinApi"
+    IDS_APP_TITLE           "ContactoAgendaWinApi"
+    IDC_CONTACTOAGENDAWINAPI "CONTACTOAGENDAWINAPI"
 END
 
-#endif
+#endif    // English (United States) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+/////////////////////////////////////////////////////////////////////////////
+// Spanish (Mexico) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ESM)
+LANGUAGE LANG_SPANISH, SUBLANG_SPANISH_MEXICAN
+#pragma code_page(1252)
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+ID_ContactListDialog DIALOGEX 0, 0, 622, 254
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Dialog"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    PUSHBUTTON      "Salir",ID_ExitBtn,553,225,50,14
+    LISTBOX         ID_ContactListBox,30,18,198,201,LBS_SORT | LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "Agregar Contacto",ID_AddContactWindowBtn,58,225,134,14
+END
+
+ID_AddContactDialog DIALOGEX 0, 0, 392, 264
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "Agregar Contacto"
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    DEFPUSHBUTTON   "Guardar",ID_AddContactSaveBtn,252,229,50,14
+    PUSHBUTTON      "Cancelar",ID_AddContactCancelBtn,318,229,50,14
+    LTEXT           "Nombre",ID_NameLbl,21,18,27,8
+    EDITTEXT        ID_NameTxt,19,30,74,14,ES_AUTOHSCROLL
+    LTEXT           "Apellido",ID_LastNameLbl,109,17,27,8
+    EDITTEXT        ID_LastNameTxt,106,29,74,14,ES_AUTOHSCROLL
+    LTEXT           "Telefono",ID_PhoneNumberLbl,21,57,30,8
+    EDITTEXT        ID_PhoneNumberTxt,19,69,74,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Email",ID_EmailLbl,109,57,19,8
+    EDITTEXT        ID_EmailTxt,107,69,74,14,ES_AUTOHSCROLL
+    LTEXT           "Calle",ID_StreetLbl,21,94,17,8
+    EDITTEXT        ID_StreetTxt,19,106,74,14,ES_AUTOHSCROLL
+    LTEXT           "Numero",ID_StreetNumberLbl,108,93,27,8
+    EDITTEXT        ID_StreetNumberTxt,105,105,74,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Entre calles",ID_BetweenStreetsLbl,196,93,39,8
+    EDITTEXT        ID_BetweenStreetsTxt,193,105,74,14,ES_AUTOHSCROLL
+    LTEXT           "CP",ID_CPLbl,282,93,10,8
+    EDITTEXT        ID_CPTxt,279,105,74,14,ES_AUTOHSCROLL | ES_NUMBER
+    LTEXT           "Colonia",ID_SuburbLbl,21,130,25,8
+    EDITTEXT        ID_SuburbTxt,19,142,74,14,ES_AUTOHSCROLL
+    LTEXT           "Municipio",ID_CityLbl,108,129,31,8
+    EDITTEXT        ID_CityTxt,105,141,74,14,ES_AUTOHSCROLL
+    LTEXT           "Estado",ID_StateLbl,196,129,23,8
+    EDITTEXT        ID_StateTxt,193,141,74,14,ES_AUTOHSCROLL
+    LTEXT           "Pais",ID_CountryLbl,282,129,14,8
+    EDITTEXT        ID_CountryTxt,279,141,74,14,ES_AUTOHSCROLL
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO
+BEGIN
+    ID_ContactListDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 615
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 247
+    END
+
+    ID_AddContactDialog, DIALOG
+    BEGIN
+        LEFTMARGIN, 6
+        RIGHTMARGIN, 385
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 257
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+#endif    // Spanish (Mexico) resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -145,5 +241,7 @@ END
 // Generated from the TEXTINCLUDE 3 resource.
 //
 
+
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
+
