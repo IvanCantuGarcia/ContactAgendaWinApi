@@ -157,6 +157,10 @@ BEGIN
     EDITTEXT        ID_ShowStateTxt,433,160,74,14,ES_AUTOHSCROLL | ES_READONLY
     LTEXT           "Pais",ID_ShowCountryLbl,522,148,14,8
     EDITTEXT        ID_ShowCountryTxt,519,160,74,14,ES_AUTOHSCROLL | ES_READONLY
+    PUSHBUTTON      "Modificar",ID_EditContactBtn,266,217,50,14
+    PUSHBUTTON      "Eliminar",ID_DeleteContactBtn,335,217,50,14
+    CONTROL         "",ID_ShowcContactImage1,"Static",SS_BITMAP,430,20,13,11
+    CONTROL         "",ID_ShowcContactImage2,"Static",SS_BITMAP,517,20,13,11
 END
 
 ID_AddContactDialog DIALOGEX 0, 0, 392, 264
@@ -190,6 +194,10 @@ BEGIN
     EDITTEXT        ID_StateTxt,193,141,74,14,ES_AUTOHSCROLL
     LTEXT           "Pais",ID_CountryLbl,282,129,14,8
     EDITTEXT        ID_CountryTxt,279,141,74,14,ES_AUTOHSCROLL
+    PUSHBUTTON      "Imagen1",ID_ContactImage1Btn,206,70,50,14
+    PUSHBUTTON      "Imagen2",ID_ContactImage2Btn,293,70,50,14
+    CONTROL         "",ID_AddImage1,"Static",SS_BITMAP,198,8,20,20
+    CONTROL         "",ID_AddImage2,"Static",SS_BITMAP,285,8,13,11
 END
 
 

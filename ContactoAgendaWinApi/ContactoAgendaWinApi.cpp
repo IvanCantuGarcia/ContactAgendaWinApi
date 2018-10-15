@@ -2,6 +2,7 @@
 #include "Contact.h"
 #include "ContactoAgendaWinApi.h"
 #include <fstream>
+#include <commdlg.h>
 
 #define MAX_LOADSTRING 100
 
@@ -14,16 +15,20 @@ HWND hwndMainWindowListBox;
 LRESULT CALLBACK mainWindowProc(HWND, UINT, WPARAM, LPARAM);
 LRESULT CALLBACK addContactWindowProc(HWND, UINT, WPARAM, LPARAM);
 
-
+int validateAddWindowFields(HWND);
 int getContactNewId();
-void getContactById(int, Contact&);
+Contact* getContactById(int);
 void addContact(HWND);
+void deleteContact(HWND);
 void saveContacts(HWND);
 void loadContacts();
 
 void loadContactListBox(HWND, int);
+void cleanShowContactFields(HWND);
 
 Contact *origin, *aux;
+
+wstring fileLocation[2];
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow) {
 
@@ -72,7 +77,15 @@ LRESULT CALLBACK mainWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 
 			}
 			break;
+			case ID_DeleteContactBtn: {
 
+				hwndMainWindowListBox = GetDlgItem(hWnd, ID_ContactListBox);
+				deleteContact(hwndMainWindowListBox);
+				loadContactListBox(hwndMainWindow, ID_ContactListBox);
+				cleanShowContactFields(hwndMainWindow);
+
+			}
+			break;
 			case ID_ExitBtn: {
 
 				DestroyWindow(hWnd);
@@ -87,25 +100,31 @@ LRESULT CALLBACK mainWindowProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM l
 					int selectedItem = (int)SendMessage(hwndMainWindowListBox, LB_GETCURSEL, 0, 0);
 					int contactId = (int)SendMessage(hwndMainWindowListBox, LB_GETITEMDATA, selectedItem, 0);
 
-					Contact selectedContact;
-					selectedContact.contactId = -1;
+					Contact* selectedContact = NULL;
 
-					getContactById(contactId, selectedContact);
+					selectedContact = getContactById(contactId);
 
-					if (selectedContact.contactId != -1)
+					if (selectedContact != NULL)
 					{
-						SetDlgItemText(hWnd, ID_ShowNameTxt, (selectedContact.name).c_str());
-						SetDlgItemText(hWnd, ID_ShowLastNameTxt, (selectedContact.lastName).c_str());
-						SetDlgItemText(hWnd, ID_ShowPhoneNumberTxt, (selectedContact.phoneNumber).c_str());
-						SetDlgItemText(hWnd, ID_ShowEmailTxt, (selectedContact.email).c_str());
-						SetDlgItemText(hWnd, ID_ShowStreetTxt, (selectedContact.street).c_str());
-						SetDlgItemText(hWnd, ID_ShowStreetNumberTxt, (selectedContact.streetNumber).c_str());
-						SetDlgItemText(hWnd, ID_ShowBetweenStreetsTxt, (selectedContact.betweenStreets).c_str());
-						SetDlgItemText(hWnd, ID_ShowCPTxt, (selectedContact.CP).c_str());
-						SetDlgItemText(hWnd, ID_ShowSuburbTxt, (selectedContact.suburb).c_str());
-						SetDlgItemText(hWnd, ID_ShowCityTxt, (selectedContact.city).c_str());
-						SetDlgItemText(hWnd, ID_ShowStateTxt, (selectedContact.state).c_str());
-						SetDlgItemText(hWnd, ID_ShowCountryTxt, (selectedContact.country).c_str());
+						SetDlgItemText(hWnd, ID_ShowNameTxt, (selectedContact->name).c_str());
+						SetDlgItemText(hWnd, ID_ShowLastNameTxt, (selectedContact->lastName).c_str());
+						SetDlgItemText(hWnd, ID_ShowPhoneNumberTxt, (selectedContact->phoneNumber).c_str());
+						SetDlgItemText(hWnd, ID_ShowEmailTxt, (selectedContact->email).c_str());
+						SetDlgItemText(hWnd, ID_ShowStreetTxt, (selectedContact->street).c_str());
+						SetDlgItemText(hWnd, ID_ShowStreetNumberTxt, (selectedContact->streetNumber).c_str());
+						SetDlgItemText(hWnd, ID_ShowBetweenStreetsTxt, (selectedContact->betweenStreets).c_str());
+						SetDlgItemText(hWnd, ID_ShowCPTxt, (selectedContact->CP).c_str());
+						SetDlgItemText(hWnd, ID_ShowSuburbTxt, (selectedContact->suburb).c_str());
+						SetDlgItemText(hWnd, ID_ShowCityTxt, (selectedContact->city).c_str());
+						SetDlgItemText(hWnd, ID_ShowStateTxt, (selectedContact->state).c_str());
+						SetDlgItemText(hWnd, ID_ShowCountryTxt, (selectedContact->country).c_str());
+
+						HBITMAP bmp, bmp2;
+						bmp = (HBITMAP)LoadImage(GetModuleHandle(NULL), (selectedContact->imgPath[0].c_str()), IMAGE_BITMAP, 100, 100, LR_LOADFROMFILE);
+						SendDlgItemMessage(hWnd, ID_ShowcContactImage1, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
+
+						bmp2 = (HBITMAP)LoadImage(GetModuleHandle(NULL), (selectedContact->imgPath[1].c_str()), IMAGE_BITMAP, 100, 100, LR_LOADFROMFILE);
+						SendDlgItemMessage(hWnd, ID_ShowcContactImage2, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp2);
 					}
 
 				}
@@ -144,17 +163,64 @@ LRESULT CALLBACK addContactWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
 		case ID_AddContactSaveBtn: {
 
 			addContact(hWnd);
-			MessageBox(hWnd, L"Se ha agregado exitosamente el Contacto.", L"Guardado.", MB_ICONINFORMATION);
-			DestroyWindow(hWnd);
 
 		}
-								   break;
+		break;
 		case ID_AddContactCancelBtn: {
 
 			DestroyWindow(hWnd);
 
 		}
-									 break;
+		break;
+		case ID_ContactImage1Btn: {
+			OPENFILENAME ofn;
+			char szFileName[MAX_PATH] = "";
+			ZeroMemory(&ofn, sizeof(ofn));
+			ofn.lStructSize = sizeof(ofn);
+			ofn.hwndOwner = hWnd;
+			ofn.lpstrFilter = L"24 bit Bitmap(.bmp)\0*.bmp\0 16 bit Bitmap(.bmp)\0*.bmp\0 8 bit Bitmap(.bmp)\0*.bmp\0";
+
+			ofn.lpstrFile = (LPWSTR)szFileName;
+			ofn.nMaxFile = MAX_PATH;
+			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+			ofn.lpstrDefExt = L"bmp";
+			if (GetOpenFileName(&ofn) == TRUE)
+			{
+				fileLocation[0] = ofn.lpstrFile;
+				HBITMAP bmp;
+				bmp = (HBITMAP)LoadImage(GetModuleHandle(NULL), ofn.lpstrFile, IMAGE_BITMAP, 100, 100, LR_LOADFROMFILE);
+				SendDlgItemMessage(hWnd, ID_AddImage1, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
+
+			}
+			else
+				MessageBox(0, L"No eligio archivo", L"Aviso", MB_OK | MB_ICONINFORMATION);
+
+		}
+		break;
+		case ID_ContactImage2Btn: {
+			OPENFILENAME ofn;
+			char szFileName[MAX_PATH] = "";
+			ZeroMemory(&ofn, sizeof(ofn));
+			ofn.lStructSize = sizeof(ofn);
+			ofn.hwndOwner = hWnd;
+			ofn.lpstrFilter = L"24 bit Bitmap(.bmp)\0*.bmp\0 16 bit Bitmap(.bmp)\0*.bmp\0 8 bit Bitmap(.bmp)\0*.bmp\0";
+
+			ofn.lpstrFile = (LPWSTR)szFileName;
+			ofn.nMaxFile = MAX_PATH;
+			ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY;
+			ofn.lpstrDefExt = L"bmp";
+			if (GetOpenFileName(&ofn) == TRUE)
+			{
+				fileLocation[1] = ofn.lpstrFile;
+				HBITMAP bmp;
+				bmp = (HBITMAP)LoadImage(GetModuleHandle(NULL), ofn.lpstrFile, IMAGE_BITMAP, 100, 100, LR_LOADFROMFILE);
+				SendDlgItemMessage(hWnd, ID_AddImage2, STM_SETIMAGE, IMAGE_BITMAP, (LPARAM)bmp);
+			}
+			else
+				MessageBox(0, L"No eligio archivo", L"Aviso", MB_OK | MB_ICONINFORMATION);
+
+		}
+		break;
 		}
 	}
 	break;
@@ -168,7 +234,96 @@ LRESULT CALLBACK addContactWindowProc(HWND hWnd, UINT message, WPARAM wParam, LP
 	return 0;
 }
 
-void getContactById(int idContactAux, Contact &contactAux) {
+int validateAddWindowFields(HWND hWnd) {
+
+	TCHAR valName[1024];
+	TCHAR valLastName[1024];
+	TCHAR valPhoneNumber[1024];
+	TCHAR valEmail[1024];
+	TCHAR valStreet[1024];
+	TCHAR valBetweenStreets[1024];
+	TCHAR valStreetNumber[1024];
+	TCHAR valCP[1024];
+	TCHAR valSuburb[1024];
+	TCHAR valCity[1024];
+	TCHAR valState[1024];
+	TCHAR valCountry[1024];
+
+	GetWindowText(GetDlgItem(hWnd, ID_NameTxt), valName, 1024);
+	GetWindowText(GetDlgItem(hWnd, ID_LastNameTxt),valLastName, 1024);
+	GetWindowText(GetDlgItem(hWnd, ID_PhoneNumberTxt), valPhoneNumber, 1024);
+	GetWindowText(GetDlgItem(hWnd, ID_EmailTxt), valEmail, 1024);
+	GetWindowText(GetDlgItem(hWnd, ID_StreetTxt), valStreet, 1024);
+	GetWindowText(GetDlgItem(hWnd, ID_BetweenStreetsTxt), valBetweenStreets, 1024);
+	GetWindowText(GetDlgItem(hWnd, ID_StreetNumberTxt), valStreetNumber, 1024);
+	GetWindowText(GetDlgItem(hWnd, ID_CPTxt), valCP, 1024);
+	GetWindowText(GetDlgItem(hWnd, ID_SuburbTxt), valSuburb, 1024);
+	GetWindowText(GetDlgItem(hWnd, ID_CityTxt), valCity, 1024);
+	GetWindowText(GetDlgItem(hWnd, ID_StateTxt), valState, 1024);
+	GetWindowText(GetDlgItem(hWnd, ID_CountryTxt), valCountry, 1024);
+
+	if (!valName || GetWindowTextLengthA(GetDlgItem(hWnd, ID_NameTxt)) <= 0 || valName == L""){
+		MessageBox(hWnd, L"Ingrese un Nombre de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if (!valLastName || GetWindowTextLengthA(GetDlgItem(hWnd, ID_LastNameTxt)) <= 0 || valLastName == L"") {
+		MessageBox(hWnd, L"Ingrese un Apellido de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if (!valPhoneNumber || GetWindowTextLengthA(GetDlgItem(hWnd, ID_PhoneNumberTxt)) <= 0 || valPhoneNumber == L"") {
+		MessageBox(hWnd, L"Ingrese un Telefono de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if (!valEmail || GetWindowTextLengthA(GetDlgItem(hWnd, ID_EmailTxt)) <= 0 || valEmail == L"") {
+		MessageBox(hWnd, L"Ingrese un Email de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if (!valStreet || GetWindowTextLengthA(GetDlgItem(hWnd, ID_StreetTxt)) <= 0 || valStreet == L"") {
+		MessageBox(hWnd, L"Ingrese una Calle de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if (!valStreetNumber || GetWindowTextLengthA(GetDlgItem(hWnd, ID_StreetNumberTxt)) <= 0 || valStreetNumber == L"") {
+		MessageBox(hWnd, L"Ingrese un Numero de Calle de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if (!valBetweenStreets || GetWindowTextLengthA(GetDlgItem(hWnd, ID_BetweenStreetsTxt)) <= 0 || valBetweenStreets == L"") {
+		MessageBox(hWnd, L"Ingrese Entre calles de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if (!valCP || GetWindowTextLengthA(GetDlgItem(hWnd, ID_CPTxt)) <= 0 || valCP == L"") {
+		MessageBox(hWnd, L"Ingrese el Codigo Postal de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if (!valSuburb || GetWindowTextLengthA(GetDlgItem(hWnd, ID_SuburbTxt)) <= 0 || valSuburb == L"") {
+		MessageBox(hWnd, L"Ingrese la Colonia de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if (!valCity || GetWindowTextLengthA(GetDlgItem(hWnd, ID_CityTxt)) <= 0 || valCity == L"") {
+		MessageBox(hWnd, L"Ingrese la Ciudad de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if (!valState || GetWindowTextLengthA(GetDlgItem(hWnd, ID_StateTxt)) <= 0 || valState == L"") {
+		MessageBox(hWnd, L"Ingrese el Estado de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if (!valCountry || GetWindowTextLengthA(GetDlgItem(hWnd, ID_CountryTxt)) <= 0 || valCountry == L"") {
+		MessageBox(hWnd, L"Ingrese el Pais de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if ( fileLocation[0].size() <= 0 || fileLocation[0] == L"") {
+		MessageBox(hWnd, L"Ingrese la Imagen 1 de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+	else if (fileLocation[1].size() <= 0 || fileLocation[1] == L"") {
+		MessageBox(hWnd, L"Ingrese la Imagen 2 de contacto.", L"Error en creacion de contacto.", MB_ICONINFORMATION);
+		return 0;
+	}
+
+	return 1;
+
+}
+
+Contact* getContactById(int idContactAux) {
 
 	aux = origin;
 
@@ -176,7 +331,7 @@ void getContactById(int idContactAux, Contact &contactAux) {
 	{
 		if (aux->contactId == idContactAux)
 		{
-			contactAux = *aux;
+			return aux;
 			break;
 		}
 		aux = aux->next;
@@ -207,6 +362,11 @@ void addContact(HWND hWnd) {
 	TCHAR buff[1024];
 
 	aux = origin;
+
+	if (validateAddWindowFields(hWnd) == 0)
+	{
+		return;
+	}
 
 	int newContactId = getContactNewId();
 
@@ -239,6 +399,8 @@ void addContact(HWND hWnd) {
 		origin->state = buff;
 		GetWindowText(GetDlgItem(hWnd, ID_CountryTxt), buff, 1024);
 		origin->country = buff;
+		origin->imgPath[0] = fileLocation[0];
+		origin->imgPath[1] = fileLocation[1];
 
 		origin->next = NULL;
 		origin->prev = NULL;
@@ -277,11 +439,67 @@ void addContact(HWND hWnd) {
 		aux->state = buff;
 		GetWindowText(GetDlgItem(hWnd, ID_CountryTxt), buff, 1024);
 		aux->country = buff;
+		aux->imgPath[0] = fileLocation[0];
+		aux->imgPath[1] = fileLocation[1];	
+
 		aux->next = NULL;
 
 	}
 
 	aux = origin;
+	fileLocation[0] = fileLocation[1] = L"";
+	MessageBox(hWnd, L"Se ha agregado exitosamente el Contacto.", L"Guardado.", MB_ICONINFORMATION);
+	DestroyWindow(hWnd);
+
+}
+
+void deleteContact(HWND hWnd) {
+
+	int selectedItem = (int)SendMessage(hWnd, LB_GETCURSEL, 0, 0);
+	int contactId = (int)SendMessage(hWnd, LB_GETITEMDATA, selectedItem, 0);
+
+	if (selectedItem == -1)
+	{
+		MessageBox(NULL, L"Debe seleccionar un contacto para así borrarlo.", L"Eliminar contacto.", MB_ICONEXCLAMATION);
+		return;
+	}
+
+	aux = getContactById(contactId);
+
+	const int result = MessageBox(NULL, L"Desea borrar el contacto?", L"Eliminar contacto.", MB_YESNOCANCEL);
+
+	if (result == IDYES) {
+
+		if (aux->prev == NULL && aux->next == NULL)
+		{
+			delete aux;
+			aux = origin = NULL;
+		}
+		else if (aux->prev == NULL)
+		{
+			origin = aux->next;
+			delete aux;
+			origin->prev = NULL;
+			aux = origin;
+		}
+		else if (aux-> next == NULL)
+		{
+			aux->prev->next = NULL;
+			delete aux;
+			aux = origin;
+		}
+		else
+		{
+			aux->prev->next = aux->next;
+			aux->next->prev = aux->prev;
+			delete aux;
+			aux = origin;
+		}
+		
+	}
+	else {
+		return;
+	}
 
 }
 
@@ -352,6 +570,7 @@ void loadContacts() {
 	return;
 
 }
+
 void saveContacts(HWND hWnd) {
 
 	aux = origin;
@@ -392,5 +611,22 @@ void loadContactListBox(HWND hWnd, int contactListBoxId) {
 	}
 
 	SetFocus(hwndMainWindowListBox);
+
+}
+
+void cleanShowContactFields(HWND hWnd) {
+
+	SetDlgItemText(hWnd, ID_ShowNameTxt, L"");
+	SetDlgItemText(hWnd, ID_ShowLastNameTxt, L"");
+	SetDlgItemText(hWnd, ID_ShowPhoneNumberTxt, L"");
+	SetDlgItemText(hWnd, ID_ShowEmailTxt, L"");
+	SetDlgItemText(hWnd, ID_ShowStreetTxt, L"");
+	SetDlgItemText(hWnd, ID_ShowStreetNumberTxt, L"");
+	SetDlgItemText(hWnd, ID_ShowBetweenStreetsTxt, L"");
+	SetDlgItemText(hWnd, ID_ShowCPTxt, L"");
+	SetDlgItemText(hWnd, ID_ShowSuburbTxt, L"");
+	SetDlgItemText(hWnd, ID_ShowCityTxt, L"");
+	SetDlgItemText(hWnd, ID_ShowStateTxt, L"");
+	SetDlgItemText(hWnd, ID_ShowCountryTxt, L"");
 
 }

@@ -16,6 +16,7 @@
 #define ID_ExitBtn                      1000
 #define ID_ContactListBox               1001
 #define ID_AddContactWindowBtn          1002
+#define ID_EditContactBtn               1003
 #define ID_NameLbl                      1004
 #define ID_NameTxt                      1005
 #define ID_LastNameLbl                  1006
@@ -66,6 +67,13 @@
 #define ID_ShowStateTxt                 1051
 #define ID_ShowCountryLbl               1052
 #define ID_ShowCountryTxt               1053
+#define ID_ContactImage1Btn             1054
+#define ID_ContactImage2Btn             1055
+#define ID_AddImage1                    1056
+#define ID_AddImage2                    1057
+#define ID_ShowcContactImage1           1058
+#define ID_ShowcContactImage2           1059
+#define ID_DeleteContactBtn             1100
 #define IDC_STATIC                      -1
 
 // Next default values for new objects
@@ -75,7 +83,7 @@
 #define _APS_NO_MFC                     1
 #define _APS_NEXT_RESOURCE_VALUE        131
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1054
+#define _APS_NEXT_CONTROL_VALUE         1060
 #define _APS_NEXT_SYMED_VALUE           110
 #endif
 #endif
